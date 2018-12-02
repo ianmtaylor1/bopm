@@ -22,7 +22,7 @@ solr <- function(y, X, ncat=max(y),
   n <- length(y)
   p <- dim(X)[2]
 
-  chain.list <- foreach(chain=1:n.chains) %do% {
+  chain.list <- foreach::foreach(chain=1:n.chains) %do% {
     # Initial values of parameters:
     # beta - regression coefficients
     beta <- c(rmvnorm(n=1, mu=beta.mean, Sigma=beta.covar))

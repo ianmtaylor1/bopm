@@ -8,6 +8,7 @@ Description: Fits a symmetric ordinal linear regression model to supplied data.
 License: GNU GPLv3
 Encoding: UTF-8
 LazyData: true
+Depends:
+    coda
 Imports:
-    coda,
     foreach
