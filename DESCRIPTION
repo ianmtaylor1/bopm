@@ -1,0 +1,13 @@
+Package: solr
+Type: Package
+Title: Symmetric Ordinal Linear Regression
+Version: 0.1.0
+Author: Ian Taylor
+Maintainer: Ian Taylor <ian@iantaylor.xyz>
+Description: Fits a symmetric ordinal linear regression model to supplied data. 
+License: GNU GPLv3
+Encoding: UTF-8
+LazyData: true
+Imports:
+    coda,
+    foreach
