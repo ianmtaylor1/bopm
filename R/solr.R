@@ -54,7 +54,7 @@ solr <- function(y, X, ncat=max(y),
       results[rep,] <- c(beta,sep)
     }
 
-    chain.list <- append(chain.list, as.mcmc(results))
+    chain.list[[chain]] <- as.mcmc(results)
   }
 
   return(mcmc.list(chain.list))
