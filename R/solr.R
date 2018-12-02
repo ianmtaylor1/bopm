@@ -22,7 +22,8 @@ solr <- function(y, X, ncat=max(y),
   n <- length(y)
   p <- dim(X)[2]
 
-  chain.list <- foreach::foreach(chain=1:n.chains) %do% {
+  chain.list <- list()
+  for(chain in 1:n.chains) {
     # Initial values of parameters:
     # beta - regression coefficients
     beta <- c(rmvnorm(n=1, mu=beta.mean, Sigma=beta.covar))
@@ -53,7 +54,7 @@ solr <- function(y, X, ncat=max(y),
       results[rep,] <- c(beta,sep)
     }
 
-    as.mcmc(results)
+    chain.list <- append(chain.list, as.mcmc(results))
   }
 
   return(mcmc.list(chain.list))
