@@ -1,30 +1,39 @@
 # Symmetric Ordinal Linear Regression
-# y - The ordinal response variable. Should take integer values >= 1
-# x - data.frame with covariates
-# ncat - Number of possible categories for response
-# beta.mean - prior mean for beta (regression coefficients)
-# beta.covar - prior covariance matrix for beta (regression coefficients)
+# formula - the model formula to be fitted
+# data - a data.frame containing the data necessary to fit the model
+# ncat - Number of possible categories for response (default: max(y))
+# beta.mean - prior mean for beta (regression coefficients) (default: zero)
+# beta.covar - prior covariance matrix for beta (regression coefficients) (default: identity)
 # n.iter - number of iterations per chain
 # n.chains - number of chains to run
 # threshold.prefix - prefix to use naming the thresholds between categories
-# print - if TRUE, print small progress notification
+# print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
-solr <- function(y, x, ncat=max(y),
-                 beta.mean=rep(0, dim(x)[2]), beta.covar=diag(dim(x)[2]),
+solr <- function(formula, data, ncat=NULL,
+                 beta.mean=NULL, beta.covar=NULL,
                  n.iter=10000, n.chains=2,
                  threshold.prefix="_theta_",
                  print=FALSE
 ) {
+  # Get design matrix, response vector and number of categories
+  stopifnot(length(formula) == 3) # Formula must have LHS
+  mf <- model.frame(formula, data, na.action=na.fail)
+  y <- c(mf[,1])
+  xmat <- model.matrix(formula, mf)
+  if (is.null(ncat)) ncat <- max(y)
+
   # Make sure the y vector looks like we want it to
   stopifnot(y == floor(y), y >= 1, y <= ncat)
-  # Make sure x looks like we want it to
-  stopifnot(is.data.frame(x))
-  stopifnot(dim(x)[1] == length(y))
-  xmat <- data.matrix(x)
 
   # How much data and how many parameters do we have?
   n <- length(y)
-  p <- dim(x)[2]
+  p <- dim(xmat)[2]
+
+  # Fill in default prior means and covariances
+  if (is.null(beta.mean)) beta.mean <- rep(0,p)
+  if (is.null(beta.covar)) beta.covar <- diag(p)
+  stopifnot(length(beta.mean) == p)
+  stopifnot(dim(beta.covar) == c(p,p))
 
   # Pre-compute difficult matrix inverses, etc.
   beta.covar.inv <- chol2inv(chol(beta.covar))
@@ -51,7 +60,7 @@ solr <- function(y, x, ncat=max(y),
 
     # Create data frame to hold posterior samples
     results <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
-    colnames(results) <- c(colnames(x), paste(threshold.prefix, 1:(ncat-1), sep=""))
+    colnames(results) <- c(colnames(xmat), paste(threshold.prefix, 1:(ncat-1), sep=""))
 
     # MCMC/Gibbs sampling
     for(rep in 1:n.iter) {
