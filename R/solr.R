@@ -1,28 +1,30 @@
 # Symmetric Ordinal Linear Regression
 # y - The ordinal response variable. Should take integer values >= 1
-# X - data.frame with covariates
+# x - data.frame with covariates
 # ncat - Number of possible categories for response
 # beta.mean - prior mean for beta (regression coefficients)
 # beta.covar - prior covariance matrix for beta (regression coefficients)
 # n.iter - number of iterations per chain
 # n.chains - number of chains to run
+# threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress notification
 # Returns: a coda mcmc.list object with all iterations
-solr <- function(y, X, ncat=max(y),
-                 beta.mean=rep(0, dim(X)[2]), beta.covar=diag(dim(X)[2]),
+solr <- function(y, x, ncat=max(y),
+                 beta.mean=rep(0, dim(x)[2]), beta.covar=diag(dim(x)[2]),
                  n.iter=10000, n.chains=2,
+                 threshold.prefix="_theta_",
                  print=FALSE
 ) {
   # Make sure the y vector looks like we want it to
   stopifnot(y == floor(y), y >= 1, y <= ncat)
-  # Make sure X looks like we want it to
-  stopifnot(is.data.frame(X))
-  stopifnot(dim(X)[1] == length(y))
-  xmat <- data.matrix(X)
+  # Make sure x looks like we want it to
+  stopifnot(is.data.frame(x))
+  stopifnot(dim(x)[1] == length(y))
+  xmat <- data.matrix(x)
 
   # How much data and how many parameters do we have?
   n <- length(y)
-  p <- dim(X)[2]
+  p <- dim(x)[2]
 
   # Pre-compute difficult matrix inverses, etc.
   beta.covar.inv <- chol2inv(chol(beta.covar))
@@ -49,7 +51,7 @@ solr <- function(y, X, ncat=max(y),
 
     # Create data frame to hold posterior samples
     results <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
-    colnames(results) <- c(colnames(X), paste("sep", 1:(ncat-1), sep=""))
+    colnames(results) <- c(colnames(x), paste(threshold.prefix, 1:(ncat-1), sep=""))
 
     # MCMC/Gibbs sampling
     for(rep in 1:n.iter) {
