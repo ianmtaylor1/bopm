@@ -4,13 +4,14 @@
 # ncat - Number of possible categories for response (default: max(y))
 # beta.mean - prior mean for beta (regression coefficients) (default: zero)
 # beta.covar - prior covariance matrix for beta (regression coefficients) (default: identity)
+# threshold.sd - prior standard deviation of category thresholds
 # n.iter - number of iterations per chain
 # n.chains - number of chains to run
 # threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
 solr <- function(formula, data, ncat=NULL,
-                 beta.mean=NULL, beta.covar=NULL,
+                 beta.mean=NULL, beta.covar=NULL, threshold.sd=1,
                  n.iter=10000, n.chains=2,
                  threshold.prefix="_theta_",
                  print=FALSE
@@ -54,7 +55,7 @@ solr <- function(formula, data, ncat=NULL,
     sep <- rep(0, ncat - 1)
     dstnct <- floor((ncat - 1) / 2)
     if (dstnct > 0) {
-      sep[1:dstnct] <- sort(rtruncnorm(n=dstnct, b=0))
+      sep[1:dstnct] <- sort(rtruncnorm(n=dstnct, sd=threshold.sd, b=0))
       sep <- sep - rev(sep)
     }
 
@@ -77,7 +78,7 @@ solr <- function(formula, data, ncat=NULL,
       latent <- update_latent_fc(y, xmat, beta, sep)
 
       # Update separators
-      sep <- update_sep_fc(y, latent, ncat)
+      sep <- update_sep_fc(y, latent, ncat, threshold.sd)
 
       # Update beta
       beta <- update_beta_fc(latent, xmat, beta.mean, beta.covar,
@@ -96,5 +97,12 @@ solr <- function(formula, data, ncat=NULL,
     }
   }
 
-  return(mcmc.list(chain.list))
+  # Construct object to return
+  results <- mcmc.list(chain.list)
+  attr(results, "formula") <- formula
+  attr(results, "threshold.prefix") <- threshold.prefix
+  attr(results, "build.data") <- data
+  class(results) <- c("solr", class(results))
+
+  return(results)
 }
