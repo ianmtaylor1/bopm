@@ -4,17 +4,17 @@ update_sep_fc <- function(y, z, ncat, scale, symmetric) {
   if (ncat == 2) return(c(0))
   if (symmetric == TRUE) {
     # Because of symmetry, we only need this many distinct separators
-    nsep <- (ncat - 1) / 2
+    nsep <- floor((ncat - 1) / 2)
     sep <- rep(0, ncat - 1)
     # For each of those separators, pick a random variable between the
     # min and max possible as determined by z and y. Make sure to check
     # both positive and negative "mirrored" categories
-    for (i in 1:nsep) {
-      lbound <- max(-Inf, z[y == i], -z[y == ncat + 1 - i])
-      rbound <- min(0, z[y == i + 1], -z[y == ncat - i])
-      sep[i] <- rtruncnorm(n=1, sd=scale, a=lbound, b=rbound)
+    for (i in (ncat - nsep):(ncat - 1)) {
+      lbound <- max(0, abs(z[(y >= ncat + 1 - i) & (y <= i)]))
+      rbound <- min(Inf, abs(z[(y < ncat + 1 - i) | (y > i)]))
+      sep[i] <- rtruncexp(n=1, rate=1/scale, a=lbound, b=rbound)
     }
-    # Sort, to fix cases of empty categories, and mirror
+    # Sort, to fix cases of empty categories, and mirror for symmetry
     sep <- sort(sep) - sort(sep, decreasing=TRUE)
   } else {
 

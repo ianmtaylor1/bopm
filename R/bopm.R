@@ -53,12 +53,8 @@ bopm <- function(formula, data, ncat=NULL, symmetric=TRUE,
     # beta - regression coefficients
     beta <- c(rmvnorm(n=1, mu=beta.mean, Sigma=beta.covar))
     # sep - Separators between categories
-    sep <- rep(0, ncat - 1)
-    dstnct <- floor((ncat - 1) / 2)
-    if (dstnct > 0) {
-      sep[1:dstnct] <- sort(rtruncnorm(n=dstnct, sd=threshold.scale, b=0))
-      sep <- sep - rev(sep)
-    }
+    # Use regular fc update with minimal "dummy" data
+    sep <- update_sep_fc(y=c(1, ncat), z=c(-Inf, Inf), ncat, threshold.scale, symmetric)
 
     # Create data frame to hold posterior samples
     results <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
