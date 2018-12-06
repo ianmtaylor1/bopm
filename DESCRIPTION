@@ -1,10 +1,10 @@
-Package: solr
+Package: bopm
 Type: Package
-Title: Symmetric Ordinal Linear Regression
+Title: Bayesian Ordinal Probit Model
 Version: 0.1.0
 Author: Ian Taylor
 Maintainer: Ian Taylor <ian@iantaylor.xyz>
-Description: Fits a symmetric ordinal linear regression model to supplied data. 
+Description: Fits an ordinal probit model to supplied data using MCMC. 
 License: GNU GPLv3
 Encoding: UTF-8
 LazyData: true
