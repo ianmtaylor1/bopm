@@ -2,6 +2,7 @@
 # formula - the model formula to be fitted
 # data - a data.frame containing the data necessary to fit the model
 # ncat - Number of possible categories for response (default: max(y))
+# symetric - whether the thresholds should be symmetric around zero
 # beta.mean - prior mean for beta (regression coefficients) (default: zero)
 # beta.covar - prior covariance matrix for beta (regression coefficients) (default: identity)
 # threshold.scale - prior standard deviation of category thresholds
@@ -10,7 +11,7 @@
 # threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
-bopm <- function(formula, data, ncat=NULL,
+bopm <- function(formula, data, ncat=NULL, symmetric=TRUE,
                  beta.mean=NULL, beta.covar=NULL, threshold.scale=1,
                  n.iter=10000, n.chains=2,
                  threshold.prefix="_theta_",
@@ -78,7 +79,7 @@ bopm <- function(formula, data, ncat=NULL,
       latent <- update_latent_fc(y, xmat, beta, sep)
 
       # Update separators
-      sep <- update_sep_fc(y, latent, ncat, threshold.scale)
+      sep <- update_sep_fc(y, latent, ncat, threshold.scale, symmetric)
 
       # Update beta
       beta <- update_beta_fc(latent, xmat, beta.mean, beta.covar,
