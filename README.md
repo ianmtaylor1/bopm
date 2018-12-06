@@ -1,2 +1,2 @@
-# solr
-Symmetric Ordinal Linear Regression
+# bopm
+Bayesian Ordinal Probit Model
