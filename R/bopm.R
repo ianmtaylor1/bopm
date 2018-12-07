@@ -11,7 +11,7 @@
 # threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
-bopm <- function(formula, data, ncat=NULL, symmetric=TRUE,
+bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
                  beta.mean=NULL, beta.covar=NULL, threshold.scale=1,
                  n.iter=10000, n.chains=2,
                  threshold.prefix="_theta_",
