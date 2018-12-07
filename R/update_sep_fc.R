@@ -27,6 +27,8 @@ update_sep_fc <- function(y, z, ncat, scale, symmetric) {
       rbound <- min(Inf, z[y > i])
       sep[i] <- rtruncexp(n=1, rate=1/scale, a=lbound, b=rbound)
     }
+    # Sort, to fix cases of empty categories
+    sep <- sort(sep)
   }
   return(sep)
 }
