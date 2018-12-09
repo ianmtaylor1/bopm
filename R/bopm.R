@@ -96,11 +96,17 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
 
   # Construct object to return
   results <- mcmc.list(chain.list)
-  attr(results, "formula") <- formula
-  attr(results, "ncat") <- ncat
-  attr(results, "threshold.prefix") <- threshold.prefix
-  attr(results, "build.data") <- data
+  # Make it a bopm class and add attributes from function call
   class(results) <- c("bopm", class(results))
+  attr(results, "formula") <- formula
+  attr(results, "build.data") <- data
+  attr(results, "ncat") <- ncat
+  attr(results, "symmetric") <- symmetric
+  attr(results, "beta.mean") <- beta.mean
+  attr(results, "beta.covar") <- beta.covar
+  attr(results, "threshold.scale") <- threshold.scale
+  attr(results, "threshold.prefix") <- threshold.prefix
+  # Don't need: n.iter, n.chains, print
 
   return(results)
 }
