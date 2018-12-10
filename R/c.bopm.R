@@ -8,11 +8,15 @@ c.bopm <- function(...) {
     if (is.null(first)) {
       first <- obj
     } else {
-      # attr.all.equal returns NULL if objects' attributes are all equal
-      stopifnot(is.null(attr.all.equal(first, obj)))
+      attrmatch <- attr.all.equal(first, obj)
+      if (!is.null(attrmatch)) {
+        stop("Attributes of arguments don't match: '", attrmatch, "'")
+      }
     }
   }
-  combined <- NextMethod()
+  # Cast list as mcmc.list to catch if there are different timescales, 
+  # variables, etc
+  combined <- mcmc.list(NextMethod())
   attributes(combined) <- attributes(first)
   return(combined)
 }
