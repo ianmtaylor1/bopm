@@ -3,3 +3,4 @@
 S3method(c,bopm)
 S3method(window,bopm)
 export(bopm)
+export(bopm.parallel)

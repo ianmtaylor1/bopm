@@ -11,6 +11,5 @@ LazyData: true
 Imports:
     coda
 Suggests:
-    doParallel,
-    foreach
+    parallel
 RoxygenNote: 6.1.0

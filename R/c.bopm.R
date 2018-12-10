@@ -16,7 +16,7 @@ c.bopm <- function(...) {
   }
   # Cast list as mcmc.list to catch if there are different timescales, 
   # variables, etc
-  combined <- mcmc.list(NextMethod())
+  combined <- coda::mcmc.list(NextMethod())
   attributes(combined) <- attributes(first)
   return(combined)
 }
