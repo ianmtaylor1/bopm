@@ -8,5 +8,9 @@ Description: Fits an ordinal probit model to supplied data using MCMC.
 License: GNU GPLv3
 Encoding: UTF-8
 LazyData: true
-Depends:
+Imports:
     coda
+Suggests:
+    doParallel,
+    foreach
+RoxygenNote: 6.1.0

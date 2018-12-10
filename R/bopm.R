@@ -11,6 +11,7 @@
 # threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
+#' @export
 bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
                  beta.mean=NULL, beta.covar=NULL, threshold.scale=1,
                  n.iter=10000, n.chains=2,
@@ -87,7 +88,7 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
     }
 
     # Add this chain to the results
-    chain.list[[chain]] <- as.mcmc(results)
+    chain.list[[chain]] <- coda::as.mcmc(results)
 
     if (print == TRUE) {
       cat("\n")
@@ -95,7 +96,7 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
   }
 
   # Construct object to return
-  results <- mcmc.list(chain.list)
+  results <- coda::mcmc.list(chain.list)
   # Make it a bopm class and add attributes from function call
   class(results) <- c("bopm", class(results))
   attr(results, "formula") <- formula
