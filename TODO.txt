@@ -1,0 +1,7 @@
+To Do:
+summary.bopm
+ - Return summary.bopm object which extends summary.mcmc object with new things to print
+ - Get summary.mcmc first by calling NextMethod(). Then add more things.
+ - class of object should be c("summary.bopm", "summary.mcmc")
+print.summary.bopm
+ - Print out my things, then call NextMethod() to print out summary.mcmc things
