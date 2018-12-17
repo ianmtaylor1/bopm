@@ -43,6 +43,15 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
   beta.fc.var <- chol2inv(chol(t(xmat) %*% xmat + beta.covar.inv))
   beta.fc.var.chol <- chol(beta.fc.var)
 
+  # Which separators do we not need to save?
+  zerosepname <- NULL
+  if (symmetric && ((nsep %% 2) == 0)) {
+    zerosepname <- paste(threshold.prefix, nsep/2, sep="")
+  } else if (!symmetric) {
+    zerosepname <- paste(threshold.prefix, 1, sep="")
+  }
+
+  # Run each chain
   chain.list <- list()
   for(chain in 1:n.chains) {
 
@@ -58,8 +67,8 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
     sep <- update_sep_fc(y=c(1, ncat), z=c(-Inf, Inf), ncat, threshold.scale, symmetric)
 
     # Create data frame to hold posterior samples
-    results <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
-    colnames(results) <- c(colnames(xmat), paste(threshold.prefix, 1:(ncat-1), sep=""))
+    chainsamples <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
+    colnames(chainsamples) <- c(colnames(xmat), paste(threshold.prefix, 1:(ncat-1), sep=""))
 
     # MCMC/Gibbs sampling
     for(rep in 1:n.iter) {
@@ -84,11 +93,16 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
                              post.var.chol=beta.fc.var.chol)
 
       # Save the current state
-      results[rep,] <- c(beta,sep)
+      chainsamples[rep,] <- c(beta,sep)
+    }
+
+    # Remove the nuissance zero separator
+    if (!is.null(zerosepname)) {
+      chainsamples[[zerosepname]] <- NULL
     }
 
     # Add this chain to the results
-    chain.list[[chain]] <- coda::as.mcmc(results)
+    chain.list[[chain]] <- coda::as.mcmc(chainsamples)
 
     if (print == TRUE) {
       cat("\n")
