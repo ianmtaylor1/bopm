@@ -9,7 +9,8 @@ License: GNU GPLv3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    coda
+    coda,
+    truncnorm
 Suggests:
     parallel
 RoxygenNote: 6.1.0

@@ -1,5 +1,6 @@
 library(bopm)
 library(coda)
+library(parallel)
 
 rm(list=ls())
 
@@ -18,7 +19,10 @@ for (i in 1:length(cutoffs)) {
   data[(data["z"] > cutoffs[i]),"y"] <- i + 1
 }
 
+cl <- makeCluster(3)
 
-results <- bopm(y~A+B+C, data, n.chains=6, n.iter=5000, beta.covar=100*diag(4))
+results <- bopm.parallel(y~A+B+C, data, cluster=cl, n.chains=9, n.iter=10000, print=TRUE, beta.covar=100*diag(4), threshold.scale=2)
+
+stopCluster(cl)
 
 traceplot(results)

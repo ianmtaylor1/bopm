@@ -12,5 +12,5 @@ update_latent_fc <- function(y, x, beta, sep) {
     highbound[y == cat] <- extsep[cat+1]
   }
   # Generate and return z
-  return(rtruncnorm(n=length(y), mean=mean, a=lowbound, b=highbound))
+  return(truncnorm::rtruncnorm(n=length(y), mean=mean, a=lowbound, b=highbound))
 }
