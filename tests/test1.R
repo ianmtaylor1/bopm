@@ -21,8 +21,13 @@ for (i in 1:length(cutoffs)) {
 
 cl <- makeCluster(3)
 
-results <- bopm.parallel(y~A+B+C, data, cluster=cl, n.chains=9, n.iter=10000, print=TRUE, beta.covar=100*diag(4), threshold.scale=2)
+results <- bopm.parallel(y~A+B+C, data, cluster=cl,
+                         n.chains=3, n.iter=10000,
+                         beta.covar=100*diag(4), threshold.scale=2,
+                         print=TRUE)
 
 stopCluster(cl)
+
+summary(results)
 
 traceplot(results)
