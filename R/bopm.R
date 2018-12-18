@@ -8,13 +8,15 @@
 # threshold.scale - prior standard deviation of category thresholds
 # n.iter - number of iterations per chain
 # n.chains - number of chains to run
+# burn - number of iterations to discard at the start
+# thin - thinning interval. Save 1 iteration every 'thin' iterations
 # threshold.prefix - prefix to use naming the thresholds between categories
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
 #' @export
 bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
                  beta.mean=NULL, beta.covar=NULL, threshold.scale=1,
-                 n.iter=10000, n.chains=2,
+                 n.iter=10000, n.chains=2, burn=0, thin=1,
                  threshold.prefix="_theta_",
                  print=FALSE
 ) {
@@ -123,5 +125,5 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
   attr(results, "threshold.prefix") <- threshold.prefix
   # Don't need: n.iter, n.chains, print
 
-  return(results)
+  return(window(results, start=burn+1, thin=thin))
 }
