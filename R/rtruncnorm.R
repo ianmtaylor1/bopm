@@ -2,6 +2,7 @@
 # n, mean, sd - usual parameters for rnorm
 # a, b - low and high truncation points, respectively
 rtruncnorm <- function(n, a=-Inf, b=Inf, mean=0, sd=1) {
+  stopifnot(a <= b)
   # "Flip" things to the right tail if most of the truncated area tails to the right
   lhs <- abs(a - mean) > abs(b - mean)
   # Find log quantiles of the endpoints

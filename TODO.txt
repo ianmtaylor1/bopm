@@ -1,8 +1,17 @@
 To Do:
 summary.bopm
  - Return summary.bopm object which extends summary.mcmc object with new things to print
+  - formula
+  - call?
+  - n (sample size)
+  - summary of y (pct in each category)
+  - symmetric: True or False
  - Get summary.mcmc first by calling NextMethod(). Then add more things.
  - class of object should be c("summary.bopm", "summary.mcmc")
 print.summary.bopm
  - Print out my things, then call NextMethod() to print out summary.mcmc things
  - do it by making format.summary.bopm?
+predict.bopm
+ - Try to mimic behavior of predict.lm, etc
+ - If no data supplied, use build data
+ -

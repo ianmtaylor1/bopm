@@ -4,7 +4,7 @@
 # cluster - a culster (created with parallel::makeCluster) over which to spread the chains
 #' @export
 bopm.parallel <- function(cluster, n.chains=2, ...) {
-  # Check for 
+  # Check for required packages
   if (!requireNamespace("parallel", quietly=TRUE)) {
     stop("Package 'parallel' required")
   }
