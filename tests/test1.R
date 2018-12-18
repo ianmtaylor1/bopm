@@ -5,6 +5,7 @@ library(parallel)
 rm(list=ls())
 
 n <- 1000
+test <- 20
 
 data <- data.frame(A=rnorm(n), B=rnorm(n), C=rnorm(n))
 
@@ -20,14 +21,14 @@ for (i in 1:length(cutoffs)) {
 }
 
 cl <- makeCluster(3)
-
-results <- bopm.parallel(y~A+B+C, data, cluster=cl,
-                         n.chains=3, n.iter=10000,
+results <- bopm.parallel(y~A+B+C, data[1:(n-test),], cluster=cl,
+                         n.chains=3, n.iter=15000,
                          beta.covar=100*diag(4), threshold.scale=2,
-                         print=TRUE)
-
+                         burn=5000, thin=100)
 stopCluster(cl)
 
 summary(results)
 
 traceplot(results)
+
+round(cbind(predict(results, data[(n-test+1):n,]), data[(n-test+1):n,"y"]), digits=2)
