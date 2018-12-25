@@ -1,5 +1,3 @@
 To Do:
 predict.bopm
- - Try to mimic behavior of predict.lm, etc
- - If no data supplied, use build data
- -
+ - Intervals and/or standard errors of probabilities.
