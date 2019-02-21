@@ -1,3 +1,7 @@
 To Do:
 predict.bopm
  - Intervals and/or standard errors of probabilities.
+bopm
+ - Allow censored data in specific formats
+other
+ - draw from posterior predictive distribution

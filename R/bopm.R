@@ -5,6 +5,8 @@
 # symetric - whether the thresholds should be symmetric around zero
 # beta.mean - prior mean for beta (regression coefficients) (default: zero)
 # beta.covar - prior covariance matrix for beta (regression coefficients) (default: identity)
+# threshold.prior - prior distribution family of category thresholds
+#     possible values: exp, norm
 # threshold.scale - prior standard deviation of category thresholds
 # n.iter - number of iterations per chain
 # n.chains - number of chains to run
@@ -14,8 +16,10 @@
 # print - if TRUE, print small progress tracking update
 # Returns: a coda mcmc.list object with all iterations
 #' @export
-bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
-                 beta.mean=NULL, beta.covar=NULL, threshold.scale=1,
+bopm <- function(formula, data,
+                 ncat=NULL, symmetric=FALSE,
+                 beta.mean=NULL, beta.covar=NULL, 
+                 threshold.prior="exp", threshold.scale=1,
                  n.iter=10000, n.chains=2, burn=0, thin=1,
                  threshold.prefix="_theta_",
                  print=FALSE
@@ -29,12 +33,16 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
 
   # Make sure the y vector looks like we want it to
   stopifnot(y == floor(y), y >= 1, y <= ncat)
-
+  
+  # Check the prior for thresholds to be a valid value
+  stopifnot(threshold.prior %in% c("cauchy", "exp", "norm", "unif"))
+  # TODO: check for uniform prior without y's in top (or bottom) category
+  
   # How much data and how many parameters do we have?
   n <- length(y)
   p <- dim(xmat)[2]
 
-  # Fill in default prior means and covariances
+  # Fill in default prior means and covariances for beta
   if (is.null(beta.mean)) beta.mean <- rep(0,p)
   if (is.null(beta.covar)) beta.covar <- diag(p)
   stopifnot(length(beta.mean) == p)
@@ -87,7 +95,7 @@ bopm <- function(formula, data, ncat=NULL, symmetric=FALSE,
       latent <- update_latent_fc(y, xmat, beta, sep)
 
       # Update separators
-      sep <- update_sep_fc(y, latent, ncat, threshold.scale, symmetric)
+      sep <- update_sep_fc(y, latent, ncat, threshold.prior, threshold.scale, symmetric)
 
       # Update beta
       beta <- update_beta_fc(latent, xmat, beta.mean, beta.covar,

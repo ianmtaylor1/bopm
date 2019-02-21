@@ -1,6 +1,6 @@
 # Full conditional update of the separators that turn latent variables into
 # ordinal response Y
-update_sep_fc <- function(y, z, ncat, scale, symmetric) {
+update_sep_fc <- function(y, z, ncat, prior, scale, symmetric) {
   # Only two categories == same separator either case
   if (ncat == 2) return(c(0))
   if (symmetric == TRUE) {
@@ -14,7 +14,7 @@ update_sep_fc <- function(y, z, ncat, scale, symmetric) {
     for (i in (ncat - nsep):(ncat - 1)) {
       lbound <- max(0, abs(z[(y >= ncat + 1 - i) & (y <= i)]))
       rbound <- min(Inf, abs(z[(y < ncat + 1 - i) | (y > i)]))
-      sep[i] <- rtruncexp(n=1, rate=1/scale, a=lbound, b=rbound)
+      sep[i] <- rtruncx(dist=prior, n=1, scale=scale, a=lbound, b=rbound)
     }
     # Sort, to fix cases of empty categories, and mirror for symmetry
     sep <- sort(sep) - sort(sep, decreasing=TRUE)
@@ -25,10 +25,26 @@ update_sep_fc <- function(y, z, ncat, scale, symmetric) {
     for (i in (2:(ncat - 1))) {
       lbound <- max(0, z[y <= i])
       rbound <- min(Inf, z[y > i])
-      sep[i] <- rtruncexp(n=1, rate=1/scale, a=lbound, b=rbound)
+      sep[i] <- rtruncx(dist=prior, n=1, scale=scale, a=lbound, b=rbound)
     }
     # Sort, to fix cases of empty categories
     sep <- sort(sep)
   }
   return(sep)
+}
+
+# Function to generically sample from one of the many allowed
+# truncated full conditional distributions for the separators
+rtruncx(dist, n, scale, a, b) {
+  if (dist == "exp") {
+    return(rtruncexp(n=n, rate=1/scale, a=a, b=b))
+  } else if (dist == "norm") {
+    return(truncnorm::rtruncnorm(n=n, sd=scale, a=a, b=b))
+  } else if (dist == "cauchy") {
+    return(rtrunccauchy(n=n, scale=scale, a=a, b=b))
+  } else if (dist == "unif") {
+    return(runif(n=n, min=a, max=b))
+  } else {
+    stop("Unallowed prior for separators.")
+  }
 }
