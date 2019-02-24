@@ -35,7 +35,7 @@ update_sep_fc <- function(y, z, ncat, prior, scale, symmetric) {
 
 # Function to generically sample from one of the many allowed
 # truncated full conditional distributions for the separators
-rtruncx(dist, n, scale, a, b) {
+rtruncx <- function(dist, n, scale, a, b) {
   if (dist == "exp") {
     return(rtruncexp(n=n, rate=1/scale, a=a, b=b))
   } else if (dist == "norm") {

@@ -18,7 +18,7 @@
 #' @export
 bopm <- function(formula, data,
                  ncat=NULL, symmetric=FALSE,
-                 beta.mean=NULL, beta.covar=NULL, 
+                 beta.mean=NULL, beta.covar=NULL,
                  threshold.prior="exp", threshold.scale=1,
                  n.iter=10000, n.chains=2, burn=0, thin=1,
                  threshold.prefix="_theta_",
@@ -33,11 +33,19 @@ bopm <- function(formula, data,
 
   # Make sure the y vector looks like we want it to
   stopifnot(y == floor(y), y >= 1, y <= ncat)
-  
+
   # Check the prior for thresholds to be a valid value
   stopifnot(threshold.prior %in% c("cauchy", "exp", "norm", "unif"))
-  # TODO: check for uniform prior without y's in top (or bottom) category
-  
+  # Check that a uniform prior will actually be okay
+  if (threshold.prior == "unif" && ncat > 2) {
+    # Need at least one data point in the "extreme" positions
+    if (symmetric) {
+      stopifnot(sum(y == ncat) + sum(y == 1) > 0)
+    } else {
+      stopifnot(sum(y == ncat) > 0)
+    }
+  }
+
   # How much data and how many parameters do we have?
   n <- length(y)
   p <- dim(xmat)[2]
@@ -74,7 +82,15 @@ bopm <- function(formula, data,
     beta <- c(rmvnorm(n=1, mu=beta.mean, Sigma=beta.covar))
     # sep - Separators between categories
     # Use regular fc update with minimal "dummy" data
-    sep <- update_sep_fc(y=c(1, ncat), z=c(-Inf, Inf), ncat, threshold.scale, symmetric)
+    if (threshold.prior == "unif") {
+      # Uniform is improper, so let's use cauchy instead for initial values
+      sep <- update_sep_fc(y=c(1, ncat), z=c(-Inf, Inf), ncat,
+                           "cauchy", threshold.scale, symmetric)
+    } else {
+      sep <- update_sep_fc(y=c(1, ncat), z=c(-Inf, Inf), ncat,
+                           threshold.prior, threshold.scale, symmetric)
+    }
+
 
     # Create data frame to hold posterior samples
     chainsamples <- data.frame(matrix(0, nrow=n.iter, ncol=p+ncat-1))
